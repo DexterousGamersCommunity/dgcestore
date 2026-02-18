@@ -1,0 +1,72 @@
+[
+  {
+    "id": "mlbb",
+    "name": "Mobile Legends",
+    "slug": "mobile-legends",
+    "category": "MOBA",
+    "developer": "Moonton",
+    "banner": "assets/images/games/mobile-legends.jpg",
+    "icon": "assets/images/logos/mlbb-logo.png",
+    "description": "Top up Diamonds for Mobile Legends and enjoy skins, heroes, and exclusive in-game content instantly.",
+    "currency_name": "Diamonds",
+    "min_topup": 50,
+    "max_topup": 5000,
+    "status": "active"
+  },
+  {
+    "id": "codm",
+    "name": "Call of Duty Mobile",
+    "slug": "call-of-duty-mobile",
+    "category": "FPS",
+    "developer": "Activision",
+    "banner": "assets/images/games/codm.jpg",
+    "icon": "assets/images/logos/codm-logo.png",
+    "description": "Recharge CP (COD Points) safely and quickly for Call of Duty Mobile.",
+    "currency_name": "CP",
+    "min_topup": 80,
+    "max_topup": 10000,
+    "status": "active"
+  },
+  {
+    "id": "genshin",
+    "name": "Genshin Impact",
+    "slug": "genshin-impact",
+    "category": "RPG",
+    "developer": "HoYoverse",
+    "banner": "assets/images/games/genshin.jpg",
+    "icon": "assets/images/logos/genshin-logo.png",
+    "description": "Top up Genesis Crystals for Genshin Impact instantly and securely.",
+    "currency_name": "Genesis Crystals",
+    "min_topup": 60,
+    "max_topup": 6480,
+    "status": "active"
+  },
+  {
+    "id": "pubgm",
+    "name": "PUBG Mobile",
+    "slug": "pubg-mobile",
+    "category": "Battle Royale",
+    "developer": "Tencent Games",
+    "banner": "assets/images/games/pubgm.jpg",
+    "icon": "assets/images/logos/pubgm-logo.png",
+    "description": "Recharge UC for PUBG Mobile with fast processing and secure payments.",
+    "currency_name": "UC",
+    "min_topup": 60,
+    "max_topup": 10000,
+    "status": "active"
+  },
+  {
+    "id": "valorant",
+    "name": "Valorant",
+    "slug": "valorant",
+    "category": "FPS",
+    "developer": "Riot Games",
+    "banner": "assets/images/games/valorant.jpg",
+    "icon": "assets/images/logos/valorant-logo.png",
+    "description": "Buy Valorant Points instantly and unlock premium skins and battle passes.",
+    "currency_name": "Valorant Points",
+    "min_topup": 475,
+    "max_topup": 11000,
+    "status": "active"
+  }
+]

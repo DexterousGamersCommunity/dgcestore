@@ -1,0 +1,34 @@
+{
+  "sliders": [
+    {
+      "id": 1,
+      "title": "Top Up Your Favorite Games Instantly!",
+      "description": "Fast, secure, and hassle-free game credits for Mobile Legends, PUBG, Genshin Impact, and more.",
+      "image": "assets/images/banners/slider1.jpg",
+      "buttonText": "Top Up Now",
+      "buttonLink": "#games",
+      "isActive": true,
+      "order": 1
+    },
+    {
+      "id": 2,
+      "title": "Exclusive Rewards for Members",
+      "description": "Sign up today and earn reward points every time you purchase game credits.",
+      "image": "assets/images/banners/slider2.jpg",
+      "buttonText": "Join Now",
+      "buttonLink": "signupmember.html",
+      "isActive": true,
+      "order": 2
+    },
+    {
+      "id": 3,
+      "title": "Secure & Trusted Payment Methods",
+      "description": "We support GCash, PayMaya, Bank Transfer, and other secure payment options.",
+      "image": "assets/images/banners/slider3.jpg",
+      "buttonText": "View Payments",
+      "buttonLink": "#payments",
+      "isActive": true,
+      "order": 3
+    }
+  ]
+}

@@ -1,0 +1,98 @@
+[
+  {
+    "id": 1,
+    "name": "Mobile Legends",
+    "slug": "mobile-legends",
+    "category": "MOBA",
+    "image": "assets/images/games/mobile-legends.jpg",
+    "banner": "assets/images/banners/ml-banner.jpg",
+    "popular": true,
+    "status": "active",
+    "products": [
+      { "amount": "86 Diamonds", "price": 49 },
+      { "amount": "172 Diamonds", "price": 95 },
+      { "amount": "257 Diamonds", "price": 140 },
+      { "amount": "706 Diamonds", "price": 370 }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "Call of Duty Mobile",
+    "slug": "codm",
+    "category": "FPS",
+    "image": "assets/images/games/codm.jpg",
+    "banner": "assets/images/banners/codm-banner.jpg",
+    "popular": true,
+    "status": "active",
+    "products": [
+      { "amount": "80 CP", "price": 49 },
+      { "amount": "400 CP", "price": 240 },
+      { "amount": "800 CP", "price": 470 },
+      { "amount": "2000 CP", "price": 1150 }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "Genshin Impact",
+    "slug": "genshin-impact",
+    "category": "RPG",
+    "image": "assets/images/games/genshin.jpg",
+    "banner": "assets/images/banners/genshin-banner.jpg",
+    "popular": true,
+    "status": "active",
+    "products": [
+      { "amount": "60 Genesis Crystals", "price": 49 },
+      { "amount": "330 Genesis Crystals", "price": 249 },
+      { "amount": "1090 Genesis Crystals", "price": 799 },
+      { "amount": "2240 Genesis Crystals", "price": 1499 }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "PUBG Mobile",
+    "slug": "pubg-mobile",
+    "category": "Battle Royale",
+    "image": "assets/images/games/pubg.jpg",
+    "banner": "assets/images/banners/pubg-banner.jpg",
+    "popular": false,
+    "status": "active",
+    "products": [
+      { "amount": "60 UC", "price": 49 },
+      { "amount": "325 UC", "price": 240 },
+      { "amount": "660 UC", "price": 470 },
+      { "amount": "1800 UC", "price": 1150 }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "Valorant",
+    "slug": "valorant",
+    "category": "FPS",
+    "image": "assets/images/games/valorant.jpg",
+    "banner": "assets/images/banners/valorant-banner.jpg",
+    "popular": false,
+    "status": "active",
+    "products": [
+      { "amount": "475 VP", "price": 249 },
+      { "amount": "1000 VP", "price": 499 },
+      { "amount": "2050 VP", "price": 999 },
+      { "amount": "3650 VP", "price": 1699 }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "Free Fire",
+    "slug": "free-fire",
+    "category": "Battle Royale",
+    "image": "assets/images/games/freefire.jpg",
+    "banner": "assets/images/banners/freefire-banner.jpg",
+    "popular": true,
+    "status": "active",
+    "products": [
+      { "amount": "100 Diamonds", "price": 49 },
+      { "amount": "310 Diamonds", "price": 140 },
+      { "amount": "520 Diamonds", "price": 240 },
+      { "amount": "1060 Diamonds", "price": 470 }
+    ]
+  }
+]
