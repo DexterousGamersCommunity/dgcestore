@@ -1,0 +1,157 @@
+/* ============================
+   DGC E-STORE MAIN JS
+   ============================ */
+
+document.addEventListener("DOMContentLoaded", () => {
+    loadSliders();
+    loadGames();
+    setupEventListeners();
+});
+
+/* ============================
+   GLOBAL VARIABLES
+   ============================ */
+
+const gamesContainer = document.getElementById("games-container");
+const sliderContainer = document.getElementById("slider-container");
+const modal = document.getElementById("game-modal");
+const modalContent = document.getElementById("modal-content");
+
+/* ============================
+   FETCH SLIDERS
+   ============================ */
+
+async function loadSliders() {
+    try {
+        const response = await fetch("data/sliders.json");
+        const sliders = await response.json();
+
+        sliderContainer.innerHTML = sliders.map(slider => `
+            <div class="slide">
+                <img src="${slider.image}" alt="${slider.title}">
+            </div>
+        `).join("");
+
+    } catch (error) {
+        console.error("Error loading sliders:", error);
+    }
+}
+
+/* ============================
+   FETCH GAMES
+   ============================ */
+
+async function loadGames() {
+    try {
+        const response = await fetch("data/games.json");
+        const games = await response.json();
+
+        gamesContainer.innerHTML = games.map(game => `
+            <div class="game-card" data-id="${game.id}">
+                <img src="${game.image}" alt="${game.name}">
+                <h3>${game.name}</h3>
+                <p>₱${game.price}</p>
+                <button class="view-btn">View</button>
+                <button class="add-cart-btn">Add to Cart</button>
+            </div>
+        `).join("");
+
+    } catch (error) {
+        console.error("Error loading games:", error);
+    }
+}
+
+/* ============================
+   EVENT LISTENERS
+   ============================ */
+
+function setupEventListeners() {
+
+    document.addEventListener("click", async (e) => {
+
+        // View Game (Modal)
+        if (e.target.classList.contains("view-btn")) {
+            const gameId = e.target.closest(".game-card").dataset.id;
+            openModal(gameId);
+        }
+
+        // Add to Cart
+        if (e.target.classList.contains("add-cart-btn")) {
+            const card = e.target.closest(".game-card");
+            const gameId = card.dataset.id;
+            const name = card.querySelector("h3").textContent;
+            const price = card.querySelector("p").textContent.replace("₱", "");
+
+            addToCart({ id: gameId, name, price });
+        }
+
+        // Close Modal
+        if (e.target.classList.contains("close-modal")) {
+            closeModal();
+        }
+
+    });
+}
+
+/* ============================
+   MODAL SYSTEM
+   ============================ */
+
+async function openModal(gameId) {
+    try {
+        const response = await fetch("data/modal-games.json");
+        const games = await response.json();
+
+        const game = games.find(g => g.id == gameId);
+
+        if (!game) return;
+
+        modalContent.innerHTML = `
+            <span class="close-modal">&times;</span>
+            <img src="${game.image}" alt="${game.name}">
+            <h2>${game.name}</h2>
+            <p>${game.description}</p>
+            <p class="price">₱${game.price}</p>
+            <button onclick="addToCart({id:'${game.id}', name:'${game.name}', price:'${game.price}'})">
+                Add to Cart
+            </button>
+        `;
+
+        modal.style.display = "flex";
+
+    } catch (error) {
+        console.error("Error loading modal:", error);
+    }
+}
+
+function closeModal() {
+    modal.style.display = "none";
+}
+
+/* ============================
+   CART SYSTEM (LOCAL STORAGE)
+   ============================ */
+
+function addToCart(game) {
+    let cart = JSON.parse(localStorage.getItem("dgc-cart")) || [];
+
+    const existing = cart.find(item => item.id === game.id);
+
+    if (existing) {
+        existing.quantity += 1;
+    } else {
+        cart.push({ ...game, quantity: 1 });
+    }
+
+    localStorage.setItem("dgc-cart", JSON.stringify(cart));
+    alert("Added to cart!");
+}
+
+/* ============================
+   OPTIONAL: GET CART COUNT
+   ============================ */
+
+function getCartCount() {
+    const cart = JSON.parse(localStorage.getItem("dgc-cart")) || [];
+    return cart.reduce((total, item) => total + item.quantity, 0);
+}
