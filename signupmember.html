@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DGC E-Store | Sign Up</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Font Awesome (Optional Icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+    <div class="signup-container">
+        <div class="signup-card">
+
+            <h2>Create Account</h2>
+            <p>Join DGC E-Store and start purchasing your favorite game credits!</p>
+
+            <form id="signupForm">
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="fullname" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="username" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="password" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+
+                <button type="submit" class="btn-primary">
+                    <i class="fa-solid fa-user-plus"></i> Sign Up
+                </button>
+
+            </form>
+
+            <div class="signup-footer">
+                <p>Already have an account? 
+                    <a href="signinmember.html">Sign In</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main JS -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+        document.getElementById("signupForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const fullname = document.getElementById("fullname").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value;
+            const confirmPassword = document.getElementById("confirmPassword").value;
+
+            if(password !== confirmPassword){
+                alert("Passwords do not match!");
+                return;
+            }
+
+            const users = JSON.parse(localStorage.getItem("dgcUsers")) || [];
+
+            const existingUser = users.find(user => user.username === username);
+
+            if(existingUser){
+                alert("Username already exists!");
+                return;
+            }
+
+            const newUser = {
+                id: Date.now(),
+                fullname,
+                email,
+                username,
+                password
+            };
+
+            users.push(newUser);
+            localStorage.setItem("dgcUsers", JSON.stringify(users));
+
+            alert("Account created successfully!");
+            window.location.href = "signinmember.html";
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGC Admin – Orders</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#14000a;
+  color:#fff;
+}
+
+header{
+  padding:16px 20px;
+  background:#1f0012;
+  border-bottom:1px solid #ff5fa2;
+  display:flex;
+  justify-content:space-between;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+header h2{
+  color:#ff9ecb;
+  margin:0;
+  cursor:pointer;
+}
+
+header h2:hover{
+  text-decoration:underline;
+  color:#ffd1e6;
+}
+
+h3{
+  color:#ff9ecb;
+  margin:0 0 10px;
+}
+
+button{
+  background:linear-gradient(135deg,#ff9ecb,#ff5fa2);
+  border:none;
+  padding:8px 14px;
+  border-radius:10px;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+input{
+  padding:8px;
+  border-radius:8px;
+  border:none;
+  width:100%;
+}
+
+.section{
+  padding:20px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:15px;
+}
+
+.stat{
+  background:#240012;
+  border:1px solid #ff5fa2;
+  padding:15px;
+  border-radius:15px;
+  text-align:center;
+}
+
+.admin-order{
+  background:#240012;
+  border:1px solid #ff5fa2;
+  border-radius:16px;
+  padding:15px;
+  margin-bottom:18px;
+}
+
+.admin-order img{
+  width:100%;
+  max-height:300px;
+  object-fit:contain;
+  border-radius:10px;
+}
+
+.status{
+  font-weight:bold;
+  color:#ff9ecb;
+}
+
+.reject{background:#ff2f6d;color:#fff;}
+.danger{background:#ff2f2f;color:#fff;}
+
+.toast{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#ff5fa2;
+  color:#000;
+  padding:12px 18px;
+  border-radius:10px;
+  display:none;
+}
+</style>
+</head>
+
+<body>
+
+<script>
+if(localStorage.getItem("adminLogged")!=="true"){
+  location.replace("adminlogin.html");
+}
+</script>
+
+<header>
+  <h2 onclick="goDashboard()">DGC Admin Panel</h2>
+  <div style="display:flex;gap:10px;flex-wrap:wrap">
+    <button onclick="exportExcel()">Export</button>
+    <button onclick="logout()">Logout</button>
+  </div>
+</header>
+
+<div class="section">
+  <input id="search" placeholder="🔍 Search Order ID / Customer / IGN / Status" oninput="renderOrders()">
+</div>
+
+<div class="section stats">
+  <div class="stat"><h3 id="total">0</h3>Total</div>
+  <div class="stat"><h3 id="pending">0</h3>Pending</div>
+  <div class="stat"><h3 id="completed">0</h3>Completed</div>
+  <div class="stat"><h3 id="rejected">0</h3>Rejected</div>
+</div>
+
+<div class="section">
+  <h3>🕒 Pending Orders</h3>
+  <div id="pendingOrders"></div>
+</div>
+
+<div class="section">
+  <h3>✅ Completed / Rejected Orders</h3>
+  <div id="completedOrders"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const ARCHIVE_DAYS = 7;
+
+function goDashboard(){
+  location.href = "admindashboard.html";
+}
+
+function loadOrders(){
+  return JSON.parse(localStorage.getItem("dgc_orders") || "[]");
+}
+
+function saveOrders(data){
+  localStorage.setItem("dgc_orders", JSON.stringify(data));
+}
+
+function notify(msg){
+  toast.innerText = msg;
+  toast.style.display="block";
+  setTimeout(()=>toast.style.display="none",3000);
+}
+
+function autoArchive(){
+  const orders = loadOrders();
+  const now = Date.now();
+  const filtered = orders.filter(o=>{
+    if(o.status==="Completed" || o.status==="Rejected"){
+      return (now - new Date(o.date).getTime()) / 86400000 < ARCHIVE_DAYS;
+    }
+    return true;
+  });
+  saveOrders(filtered);
+}
+
+function renderStats(orders){
+  total.innerText = orders.length;
+  pending.innerText = orders.filter(o=>o.status==="Pending").length;
+  completed.innerText = orders.filter(o=>o.status==="Completed").length;
+  rejected.innerText = orders.filter(o=>o.status==="Rejected").length;
+}
+
+function renderOrders(){
+  autoArchive();
+  const orders = loadOrders();
+  const q = search.value.toLowerCase();
+
+  pendingOrders.innerHTML="";
+  completedOrders.innerHTML="";
+
+  renderStats(orders);
+
+  orders.forEach((o,i)=>{
+    if(!`${o.id}${o.customer}${o.ign}${o.status}`.toLowerCase().includes(q)) return;
+
+    const card = `
+      <div class="admin-order">
+        <div class="status">Order ${o.id} — ${o.status}</div>
+        <hr>
+        <b>Item:</b> ${o.item} (₱${o.price})<br>
+        <b>Customer:</b> ${o.customer}<br>
+        <b>IGN:</b> ${o.ign}<br>
+        <b>Payment:</b> ${o.payment}<br>
+        <b>Date:</b> ${o.date}
+        ${o.reason?`<br><b>Reason:</b> ${o.reason}`:""}
+        <img src="${o.receipt}">
+        <br><br>
+        ${
+          o.status==="Pending"
+          ? `<button onclick="approve(${i})">Approve</button>
+             <button class="reject" onclick="reject(${i})">Reject</button>`
+          : `<button class="danger" onclick="deleteOrder(${i})">Delete</button>`
+        }
+      </div>
+    `;
+
+    (o.status==="Pending"?pendingOrders:completedOrders).innerHTML+=card;
+  });
+}
+
+function approve(i){
+  const o=loadOrders();
+  o[i].status="Completed";
+  saveOrders(o);
+  notify("Order Approved");
+  renderOrders();
+}
+
+function reject(i){
+  const r=prompt("Reason?");
+  if(!r) return;
+  const o=loadOrders();
+  o[i].status="Rejected";
+  o[i].reason=r;
+  saveOrders(o);
+  notify("Order Rejected");
+  renderOrders();
+}
+
+function deleteOrder(i){
+  if(!confirm("Delete permanently?")) return;
+  const o=loadOrders();
+  o.splice(i,1);
+  saveOrders(o);
+  notify("Order Deleted");
+  renderOrders();
+}
+
+function exportExcel(){
+  const o=loadOrders();
+  let csv="ID,Item,Customer,IGN,Status,Date\n";
+  o.forEach(x=>{
+    csv+=`${x.id},${x.item},${x.customer},${x.ign},${x.status},${x.date}\n`;
+  });
+  const b=new Blob([csv]);
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(b);
+  a.download="orders.csv";
+  a.click();
+}
+
+function logout(){
+  localStorage.removeItem("adminLogged");
+  location.replace("adminlogin.html");
+}
+
+renderOrders();
+</script>
+
+</body>
+</html>

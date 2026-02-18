@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DGC Admin – Game Manager</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+body{font-family:Arial;background:#fff0f6;margin:0}
+.container{max-width:1100px;margin:auto;padding:20px}
+.card{background:#fff;border-radius:18px;padding:20px;margin-bottom:25px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+input,button{padding:12px;border-radius:12px;border:1px solid #ccc}
+button{background:#ff6fae;color:#fff;font-weight:600;cursor:pointer}
+button.danger{background:#ff4d6d}
+.game-card{border:1px solid #ddd;border-radius:14px;padding:15px}
+.actions{display:flex;gap:8px;margin-top:10px}
+.preview{width:60px;height:60px;border-radius:10px;object-fit:cover;display:none;margin-top:6px}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<!-- MAIN GAME -->
+<div class="card">
+<h3>Main Game</h3>
+
+<div class="grid">
+  <input id="gameTitle" placeholder="Game Title">
+  <input id="gameImage" placeholder="Image path (e.g. assets/game.png)" oninput="previewMainImage(this)">
+  <img id="mainPreview" class="preview">
+  <label><input type="checkbox" id="hasModal"> Has Modal</label>
+</div>
+
+<div id="noModalFields" class="grid" style="margin-top:15px">
+  <input id="gameProcess" placeholder="Processing Time">
+  <input id="gameLink" placeholder="Target HTML">
+  <label><input type="checkbox" id="gameStock" checked> In Stock</label>
+</div>
+
+<br>
+<button onclick="saveGame()">Save Game</button>
+</div>
+
+<!-- MODAL SERVICES -->
+<div class="card" id="modalSection" style="display:none">
+<h3>Game Modal Services</h3>
+<div id="services"></div>
+<button onclick="addServiceForm()">Add Service</button>
+</div>
+
+<!-- SUMMARY -->
+<div class="card">
+<h3>Game Summary</h3>
+<div id="gameList" class="grid"></div>
+</div>
+
+</div>
+
+<script>
+/* ================== CONSTANTS ================== */
+const GAME_KEY="dgc_games";
+const MODAL_KEY="dgc_modal_games";
+
+/* ================== STATE ================== */
+let games=JSON.parse(localStorage.getItem(GAME_KEY)||"[]");
+let modalGames=JSON.parse(localStorage.getItem(MODAL_KEY)||"[]");
+
+let editingIndex=null;
+let editingSlug=null;
+let mainImageData="";
+
+/* ================== ELEMENTS ================== */
+const hasModal=document.getElementById("hasModal");
+const modalSection=document.getElementById("modalSection");
+const noModalFields=document.getElementById("noModalFields");
+const services=document.getElementById("services");
+const gameList=document.getElementById("gameList");
+const mainPreview=document.getElementById("mainPreview");
+
+/* ================== UI TOGGLE ================== */
+hasModal.onchange=()=>{
+  modalSection.style.display=hasModal.checked?"block":"none";
+  noModalFields.style.display=hasModal.checked?"none":"grid";
+};
+
+const slugify=t=>t.toLowerCase().trim().replace(/\s+/g,"-");
+
+/* ================== IMAGE PREVIEW (PATH ONLY) ================== */
+function previewMainImage(input){
+  mainImageData=input.value;
+  if(mainImageData){
+    mainPreview.src=mainImageData;
+    mainPreview.style.display="block";
+  }else{
+    mainPreview.style.display="none";
+  }
+}
+
+function previewServiceImage(input){
+  const img=input.nextElementSibling;
+  if(input.value){
+    img.src=input.value;
+    img.style.display="block";
+  }else{
+    img.style.display="none";
+  }
+}
+
+/* ================== SERVICE FORM ================== */
+function addServiceForm(data={}, index=null){
+  const d=document.createElement("div");
+  d.className="card";
+  d.dataset.index=index ?? "";
+
+  d.innerHTML=`
+    <input placeholder="Service Title" value="${data.title||""}">
+    <input placeholder="Image path (e.g. assets/services/vip.png)" value="${data.image||""}" oninput="previewServiceImage(this)">
+    <img class="preview" src="${data.image||""}" style="${data.image?'display:block':''}">
+    <input placeholder="Processing Time" value="${data.process||""}">
+    <input placeholder="Target HTML" value="${data.link||""}">
+    <label><input type="checkbox" ${data.stock!=="out"?"checked":""}> In Stock</label>
+
+    <div class="actions">
+      <button onclick="saveService(this)">Save</button>
+      <button class="danger" onclick="deleteService(this)">Delete</button>
+    </div>
+  `;
+  services.appendChild(d);
+}
+
+/* ================== SAVE SERVICE ================== */
+function saveService(btn){
+  if(editingIndex===null) return alert("Save game first");
+
+  const card=btn.closest(".card");
+  const inputs=card.querySelectorAll("input");
+  const idx=card.dataset.index;
+
+  const service={
+    parent:editingSlug,
+    title:inputs[0].value,
+    image:inputs[1].value||"assets/default.png",
+    process:inputs[2].value,
+    link:inputs[3].value,
+    stock:inputs[4].checked?"in":"out",
+    priority:idx!==""?modalGames[idx].priority:
+      modalGames.filter(m=>m.parent===editingSlug).length+1
+  };
+
+  if(idx!==""){
+    modalGames[idx]=service;
+  }else{
+    modalGames.push(service);
+    card.dataset.index=modalGames.length-1;
+  }
+
+  localStorage.setItem(MODAL_KEY,JSON.stringify(modalGames));
+  localStorage.setItem("dgc_last_update",Date.now());
+  alert("✅ Service saved");
+}
+
+/* ================== DELETE SERVICE ================== */
+function deleteService(btn){
+  if(!confirm("Delete service?")) return;
+
+  const card=btn.closest(".card");
+  const idx=card.dataset.index;
+
+  if(idx!==""){
+    modalGames.splice(idx,1);
+    localStorage.setItem(MODAL_KEY,JSON.stringify(modalGames));
+    localStorage.setItem("dgc_last_update",Date.now());
+  }
+  card.remove();
+}
+
+/* ================== SAVE GAME ================== */
+function saveGame(){
+  if(!gameTitle.value) return alert("Game title required");
+
+  const slug=slugify(gameTitle.value);
+
+  const game={
+    title:gameTitle.value,
+    slug,
+    process:gameProcess.value||"Instant",
+    link:gameLink.value||"#",
+    image:mainImageData||"assets/default.png",
+    hasModal:hasModal.checked,
+    stock:hasModal.checked?"in":(gameStock.checked?"in":"out"),
+    priority:editingIndex!==null?games[editingIndex].priority:games.length+1
+  };
+
+  if(editingIndex!==null){
+    modalGames=modalGames.filter(m=>m.parent!==editingSlug);
+    games[editingIndex]=game;
+  }else{
+    games.push(game);
+  }
+
+  localStorage.setItem(GAME_KEY,JSON.stringify(games));
+  localStorage.setItem(MODAL_KEY,JSON.stringify(modalGames));
+  localStorage.setItem("dgc_last_update",Date.now());
+
+  resetForm();
+  renderGames();
+  alert("✅ Game saved");
+}
+
+/* ================== RENDER ================== */
+function renderGames(){
+  gameList.innerHTML="";
+  games.forEach((g,i)=>{
+    gameList.innerHTML+=`
+      <div class="game-card">
+        <b>${g.title}</b><br>
+        ${g.hasModal?"With Modal":"No Modal"}
+        <div class="actions">
+          <button onclick="editGame(${i})">Edit</button>
+          <button class="danger" onclick="deleteGame(${i})">Delete</button>
+        </div>
+      </div>
+    `;
+  });
+}
+
+/* ================== EDIT GAME ================== */
+function editGame(i){
+  const g=games[i];
+  editingIndex=i;
+  editingSlug=g.slug;
+
+  gameTitle.value=g.title;
+  gameProcess.value=g.process;
+  gameLink.value=g.link;
+  gameStock.checked=g.stock==="in";
+
+  hasModal.checked=g.hasModal;
+  hasModal.onchange();
+
+  mainImageData=g.image;
+  document.getElementById("gameImage").value=g.image;
+  mainPreview.src=g.image;
+  mainPreview.style.display="block";
+
+  services.innerHTML="";
+  modalGames
+    .map((m,idx)=>({...m,idx}))
+    .filter(m=>m.parent===g.slug)
+    .forEach(m=>addServiceForm(m,m.idx));
+}
+
+/* ================== DELETE GAME ================== */
+function deleteGame(i){
+  if(!confirm("Delete game?")) return;
+  modalGames=modalGames.filter(m=>m.parent!==games[i].slug);
+  games.splice(i,1);
+
+  localStorage.setItem(GAME_KEY,JSON.stringify(games));
+  localStorage.setItem(MODAL_KEY,JSON.stringify(modalGames));
+  localStorage.setItem("dgc_last_update",Date.now());
+  renderGames();
+}
+
+/* ================== RESET ================== */
+function resetForm(){
+  document.querySelectorAll("input").forEach(i=>{
+    if(i.type==="checkbox") i.checked=false;
+    else i.value="";
+  });
+  services.innerHTML="";
+  modalSection.style.display="none";
+  mainPreview.style.display="none";
+  editingIndex=null;
+  editingSlug=null;
+  mainImageData="";
+}
+
+/* ================== INIT ================== */
+renderGames();
+</script>
+
+</body>
+</html>

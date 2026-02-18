@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DGC E-Store | Rewards</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Google Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Navigation -->
+    <header class="navbar">
+        <div class="logo">
+            <img src="assets/images/logos/logo.png" alt="DGC Logo">
+            <h2>DGC E-Store</h2>
+        </div>
+
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="rewards.html" class="active">Rewards</a></li>
+                <li><a href="signinmember.html" class="btn-nav">Sign In</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="rewards-hero">
+        <h1>🎁 Earn Points. Get Rewards.</h1>
+        <p>Shop more, earn more! Redeem exciting rewards with your DGC points.</p>
+    </section>
+
+    <!-- Rewards Info Section -->
+    <section class="rewards-info">
+        <div class="info-card">
+            <h3>💎 How to Earn Points</h3>
+            <ul>
+                <li>✔ Every ₱100 purchase = 10 points</li>
+                <li>✔ Signup bonus = 50 points</li>
+                <li>✔ Referral bonus = 30 points</li>
+            </ul>
+        </div>
+
+        <div class="info-card">
+            <h3>🏆 Reward Levels</h3>
+            <ul>
+                <li>🥉 Bronze – 0 to 499 points</li>
+                <li>🥈 Silver – 500 to 1499 points</li>
+                <li>🥇 Gold – 1500+ points</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Redeem Section -->
+    <section class="redeem-section">
+        <h2>Redeem Rewards</h2>
+
+        <div class="rewards-grid">
+
+            <div class="reward-card">
+                <h3>₱50 Discount Voucher</h3>
+                <p>Cost: 200 Points</p>
+                <button onclick="redeemReward(200)">Redeem</button>
+            </div>
+
+            <div class="reward-card">
+                <h3>₱100 Discount Voucher</h3>
+                <p>Cost: 400 Points</p>
+                <button onclick="redeemReward(400)">Redeem</button>
+            </div>
+
+            <div class="reward-card">
+                <h3>Free Game Top-Up</h3>
+                <p>Cost: 800 Points</p>
+                <button onclick="redeemReward(800)">Redeem</button>
+            </div>
+
+            <div class="reward-card">
+                <h3>Exclusive Sticker Pack</h3>
+                <p>Cost: 150 Points</p>
+                <button onclick="redeemReward(150)">Redeem</button>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Points Display -->
+    <section class="points-section">
+        <h3>Your Points</h3>
+        <p id="userPoints">0 Points</p>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 DGC E-Store. All Rights Reserved.</p>
+    </footer>
+
+    <!-- Main JS -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+        // Temporary demo points
+        let userPoints = 600;
+        const pointsDisplay = document.getElementById("userPoints");
+        pointsDisplay.innerText = userPoints + " Points";
+
+        function redeemReward(cost) {
+            if (userPoints >= cost) {
+                userPoints -= cost;
+                pointsDisplay.innerText = userPoints + " Points";
+                alert("Reward successfully redeemed!");
+            } else {
+                alert("Not enough points.");
+            }
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,553 @@
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Manager Julie | VSquad Slots</title>
+
+<!-- FAVICON -->
+<link rel="icon" type="image/png" sizes="64x64" href="adminfavicon.ico">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --pink:#ff4fa3;
+  --pink-light:#ff7bbf;
+  --pink-dark:#c81e6d;
+  --pink-soft:#ffc2df;
+  --glass-bg:rgba(255,123,191,.18);
+  --text-main:#ffffff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI";
+  background:url("adminbackground.png") center/cover fixed no-repeat;
+  color:var(--text-main);
+}
+/* ===== PINK SCROLLBAR ===== */
+::-webkit-scrollbar{
+  width:12px;
+}
+
+::-webkit-scrollbar-track{
+  background:rgba(255,192,223,.35);
+  border-radius:10px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(
+    180deg,
+    var(--pink-light),
+    var(--pink),
+    var(--pink-dark)
+  );
+  border-radius:10px;
+  border:2px solid rgba(255,255,255,.4);
+}
+
+::-webkit-scrollbar-thumb:hover{
+  background:linear-gradient(
+    180deg,
+    var(--pink),
+    var(--pink-dark)
+  );
+}
+
+/* Firefox */
+*{
+  scrollbar-width: thin;
+  scrollbar-color: var(--pink) rgba(255,192,223,.4);
+}
+
+/* LOADER */
+#loader{
+  position:fixed;
+  inset:0;
+  background:var(--pink-light);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  transition:.4s ease;
+}
+#loader.fade-out{opacity:0;visibility:hidden}
+
+.loader-content{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+.loader-content img{width:190px;margin-bottom:18px}
+
+.arc-spinner{
+  width:38px;height:38px;
+  border-radius:50%;
+  border:4px solid rgba(255,255,255,.3);
+  border-top-color:#fff;
+  animation:spin .6s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* HEADER */
+header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 26px;
+  backdrop-filter:blur(18px);
+  background:linear-gradient(270deg,#ff4fa3,#ff7bbf,#ffb3d9);
+  background-size:400% 400%;
+  animation:flow 12s ease infinite;
+
+  /* FIX: remove visual bottom line */
+  border-bottom:none;
+  box-shadow:0 8px 24px rgba(0,0,0,.12);
+}
+@keyframes flow{
+  0%{background-position:0%}
+  50%{background-position:100%}
+  100%{background-position:0%}
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.header-left img{height:46px}
+
+.motto{
+  font-size:18px;
+  font-weight:600;
+  font-style:italic;
+  display:flex;
+  gap:8px;
+}
+
+.header-icons{
+  display:flex;
+  align-items:center;
+}
+.header-icons a{
+  width:42px;height:42px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  margin-left:10px;
+  transition:.3s;
+}
+.header-icons a:hover{
+  box-shadow:0 0 14px rgba(255,79,163,.8);
+}
+
+/* CONTENT */
+.container{
+  max-width:1100px;
+  margin:0 auto 50px;   
+  padding:32px;
+  background:var(--glass-bg);
+  backdrop-filter:blur(14px);
+  border-radius:28px;
+}
+
+.overall-total{
+  background:#fff;
+  color:var(--pink);
+  border-radius:22px;
+  padding:28px;
+  text-align:center;
+  margin-bottom:26px;
+}
+.overall-total h2{font-size:56px}
+
+.sub-totals{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:20px;
+  margin-bottom:30px;
+}
+
+.sub-box{
+  background:var(--pink);
+  color:#fff;
+  border-radius:18px;
+  padding:22px;
+  text-align:center;
+}
+.sub-box h3{font-size:32px}
+
+.card{
+  background:#fff;
+  color:var(--pink);
+  border-radius:24px;
+  padding:26px;
+  margin-bottom:30px;
+}
+
+.card h3{
+  background:var(--pink);
+  color:#fff;
+  padding:10px 18px;
+  border-radius:14px;
+  display:inline-block;
+  margin-bottom:18px;
+}
+
+table{width:100%}
+td{
+  padding:14px;
+  border-bottom:1px dotted var(--pink-soft);
+}
+
+.gray,
+.gray td{
+  color:#dedbe5 !important;
+  opacity:1;
+  text-decoration:line-through;
+  font-style:italic;
+}
+
+.slot-cell{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.delete-btn{
+  cursor:pointer;
+  color:#ff4d6d;
+}
+
+/* ADD TEAM */
+.add-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+  gap:14px;
+  margin-bottom:22px;
+}
+
+input{
+  padding:10px;
+  border-radius:12px;
+  border:1px solid var(--pink-soft);
+}
+
+.dgc-btn{
+  background:linear-gradient(135deg,#ff4fa3,#ff7bbf);
+  color:#fff;border:none;padding:12px 22px;border-radius:18px;
+  font-weight:600;cursor:pointer;transition:.35s;
+  box-shadow:0 8px 24px rgba(255,79,163,.45);
+}
+.dgc-btn:hover{
+  background:#fff;color:#ff4fa3;border:2px solid #ff4fa3;
+  transform:translateY(-3px) scale(1.03);
+}
+
+/* POPUP */
+.popup{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.9);
+  background:linear-gradient(135deg,#c81e6d,#ff4fa3);
+  color:#fff;padding:22px 28px;border-radius:26px;
+  display:flex;gap:14px;opacity:0;transition:.35s;z-index:9999;
+}
+.popup.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+
+  /* HEADER ICONS – WHITE */
+  .header-icons i{
+    color:#ffffff;
+  }
+
+/* REMOVE ALL DOTS / UNDERLINES FROM HEADER ICONS */
+.header-icons a,
+.header-icons a:hover,
+.header-icons a:focus,
+.header-icons a:active,
+.header-icons a:visited{
+  text-decoration: none !important;
+  border-bottom: none !important;
+  outline: none !important;
+}
+
+.slot-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.slot-actions input[type="checkbox"]{
+  width:18px;
+  height:18px;
+  accent-color: var(--pink);
+  cursor:pointer;
+}
+
+/* SCROLL TO TOP BUTTON */
+#scrollTopBtn{
+  position:fixed;
+  right:18px;
+  bottom:22px;
+  width:46px;
+  height:46px;
+  border:none;
+  border-radius:16px;
+  cursor:pointer;
+  z-index:9999;
+
+  background:linear-gradient(135deg,#ff4fa3,#ff7bbf);
+  color:#fff;
+  box-shadow:0 8px 22px rgba(255,79,163,.55);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  opacity:0;
+  pointer-events:none;
+  transform:translateY(20px) scale(.9);
+  transition:.35s ease;
+}
+
+#scrollTopBtn i{
+  font-size:18px;
+}
+
+/* visible state */
+#scrollTopBtn.show{
+  opacity:1;
+  pointer-events:auto;
+  transform:translateY(0) scale(1);
+}
+
+#scrollTopBtn:hover{
+  background:#fff;
+  color:#ff4fa3;
+  transform:translateY(-4px) scale(1.05);
+}
+
+</style>
+</head>
+
+<body>
+
+<audio id="bgMusic" src="coffee.mp3" loop></audio>
+<audio id="notifSound" src="notification.mp3"></audio>
+
+<div id="loader">
+  <div class="loader-content">
+    <img src="adminlogo.png">
+    <div class="arc-spinner"></div>
+  </div>
+</div>
+
+<header>
+  <div class="header-left">
+    <a href="admindashboard.html"><img src="adminlogo.png"></a>
+    <div class="motto" id="motto"></div>
+  </div>
+
+  <div class="header-icons">
+    <a href="managerhomepage.html"><i class="fas fa-house"></i></a>
+    <a id="musicToggle"><i class="fas fa-music"></i></a>
+    <a id="logoutBtn"><i class="fas fa-right-from-bracket"></i></a>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="overall-total">
+    VERIFIED SQUAD OVERALL TOTAL SLOTS
+    <h2 id="grandTotal">0</h2>
+  </div>
+
+  <div class="sub-totals">
+    <div class="sub-box">MPL<h3 id="mplTotal">0</h3></div>
+    <div class="sub-box">NON-MPL<h3 id="nonTotal">0</h3></div>
+  </div>
+
+  <div class="card"><h3>MPL SQUADS</h3><table id="mplTable"></table></div>
+  <div class="card"><h3>NON-MPL SQUADS</h3><table id="nonTable"></table></div>
+
+  <div class="card">
+    <h3>ADDING NEW TEAM SECTION</h3>
+    <div class="add-grid">
+      <input id="code" placeholder="Short Name">
+      <input id="squadName" placeholder="Squad Name">
+      <input id="slot" type="number" placeholder="Slots">
+      <label><input type="checkbox" id="mpl"> MPL Squad</label>
+    </div>
+
+    <button class="dgc-btn" onclick="addTeam()">Add Team</button>
+    <button class="dgc-btn" onclick="toggleEditAll()">Edit All</button>
+    <button class="dgc-btn" onclick="saveAll(true)">Save All</button>
+  </div>
+</div>
+
+<div class="popup" id="popup">
+  <i class="fas fa-circle-check"></i> VSquad saved successfully
+</div>
+
+<!-- SCROLL TO TOP BUTTON -->
+<button id="scrollTopBtn" aria-label="Back to top">
+  <i class="fas fa-ribbon"></i>
+</button>
+
+<script>
+window.addEventListener("load",()=>setTimeout(()=>loader.classList.add("fade-out"),300))
+
+const titles=[
+ ['fas fa-crown','You are a QUEEN Julie'],
+ ['fas fa-heart','I Love you Julie'],
+ ['fas fa-bolt','Kaya mo yan Julie']
+]
+const t=titles[Math.random()*titles.length|0]
+motto.innerHTML=`<i class="${t[0]}"></i>${t[1]}`
+
+let teams=JSON.parse(localStorage.getItem("vsquadData"))||[]
+let editMode=false
+
+function toggleEditAll(){editMode=!editMode;render()}
+
+function render(){
+  let mpl=0,non=0
+  mplTable.innerHTML=""
+  nonTable.innerHTML=""
+
+  teams.forEach((t,i)=>{
+    const isZero = t.slot === 0
+
+    const row=document.createElement("tr")
+    if(isZero) row.classList.add("gray")
+
+    row.innerHTML=`
+      <td>${editMode
+        ? `<input value="${t.code}" oninput="teams[${i}].code=this.value">`
+        : t.code}
+      </td>
+
+      <td>${editMode
+        ? `<input value="${t.name}" oninput="teams[${i}].name=this.value">`
+        : t.name}
+      </td>
+
+<td class="slot-cell">
+  ${editMode
+    ? `
+      <input type="number" value="${t.slot}"
+        oninput="teams[${i}].slot=+this.value;render()">
+
+      <div class="slot-actions">
+        <input type="checkbox"
+          onchange="teams[${i}].selected=this.checked">
+
+        <i class="fas fa-trash delete-btn" onclick="del(${i})"></i>
+      </div>
+    `
+    : t.slot}
+</td>
+    `
+
+    if(t.mpl){
+      mpl+=t.slot
+      mplTable.append(row)
+    }else{
+      non+=t.slot
+      nonTable.append(row)
+    }
+  })
+
+  mplTotal.innerText=mpl
+  nonTotal.innerText=non
+  grandTotal.innerText=mpl+non
+}
+
+function addTeam(){
+  const c = code.value.trim()
+  const n = squadName.value.trim()
+  const s = Number(slot.value)
+
+  // allow 0, block empty only
+  if(!c || !n || slot.value === ""){
+    alert("Complete all fields")
+    return
+  }
+
+  teams.push({
+    code: c,
+    name: n,
+    slot: s,
+    mpl: mpl.checked
+  })
+
+  code.value=""
+  squadName.value=""
+  slot.value=""
+  mpl.checked=false
+
+  saveAll(true)
+}
+
+function del(i){teams.splice(i,1);saveAll(true)}
+
+function saveAll(notif){
+  localStorage.setItem("vsquadData",JSON.stringify(teams))
+  render()
+  if(notif){
+    popup.classList.add("show")
+    notifSound.play()
+    setTimeout(()=>popup.classList.remove("show"),2500)
+  }
+}
+
+render()
+
+logoutBtn.onclick=()=>{localStorage.clear();location.href="adminlogin.html"}
+
+musicToggle.onclick=()=>{
+  if(bgMusic.paused){
+    bgMusic.volume=.6
+    bgMusic.play()
+    musicToggle.innerHTML='<i class="fas fa-pause"></i>'
+  }else{
+    bgMusic.pause()
+    musicToggle.innerHTML='<i class="fas fa-music"></i>'
+  }
+}
+
+/* ===== SCROLL TO TOP LOGIC ===== */
+const scrollBtn = document.getElementById("scrollTopBtn");
+
+window.addEventListener("scroll", () => {
+  const nearBottom =
+    window.innerHeight + window.scrollY >=
+    document.body.offsetHeight - 120;
+
+  scrollBtn.classList.toggle("show", nearBottom);
+});
+
+scrollBtn.onclick = () => {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+</script>
+
+</body>
+</html>

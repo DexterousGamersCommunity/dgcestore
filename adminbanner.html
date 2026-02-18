@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGC Admin – Banner Manager</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#061b1d;
+  color:#fff;
+}
+.container{
+  max-width:920px;
+  margin:auto;
+  padding:20px;
+}
+h1{margin-top:0}
+
+input,select,button{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:10px;
+  border:none;
+  outline:none;
+}
+
+button{
+  background:#18cfd4;
+  color:#003;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+
+.preview{
+  height:180px;
+  border-radius:14px;
+  margin-bottom:10px;
+  background:#000;
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  align-items:center;
+  padding:20px;
+}
+.preview.light{color:#fff}
+.preview.dark{
+  color:#0b5f63;
+  background-color:#fff;
+}
+.preview h2{margin:0}
+.preview p{margin:6px 0 0}
+
+.list-item{
+  background:#0b2b2e;
+  border-radius:14px;
+  padding:12px;
+  margin-bottom:10px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.list-item small{opacity:.7}
+
+.actions button{
+  width:auto;
+  margin-left:6px;
+}
+
+.badge{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:999px;
+  font-size:11px;
+  margin-right:6px;
+  background:#18cfd4;
+  color:#003;
+}
+.featured{background:#ffd166}
+.danger{background:#ff6b6b;color:#fff}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>🖼️ Banner Manager</h1>
+
+  <!-- PREVIEW -->
+  <div id="preview" class="preview light">
+    <div>
+      <h2 id="pTitle">Banner Title</h2>
+      <p id="pSub">Banner subtitle</p>
+    </div>
+  </div>
+
+  <!-- FORM -->
+  <input id="image" placeholder="Image URL" oninput="updatePreview()">
+  <input id="title" placeholder="Title" oninput="updatePreview()">
+  <input id="subtitle" placeholder="Subtitle" oninput="updatePreview()">
+  <input id="link" placeholder="Link (ex: ml.html)">
+
+  <div class="row">
+    <select id="theme" onchange="updatePreview()">
+      <option value="light">Light Text</option>
+      <option value="dark">Dark Text</option>
+    </select>
+    <input id="game" placeholder="Game slug (optional)">
+  </div>
+
+  <div class="row">
+    <input type="datetime-local" id="start">
+    <input type="datetime-local" id="end">
+  </div>
+
+  <div class="row">
+    <input type="number" id="priority" placeholder="Priority (1 = highest)">
+    <label style="display:flex;align-items:center;gap:8px">
+      <input type="checkbox" id="featured"> Featured
+    </label>
+  </div>
+
+  <button onclick="saveBanner()">💾 Save Banner</button>
+
+  <hr>
+
+  <h2>📋 Existing Banners</h2>
+  <div id="list"></div>
+</div>
+
+<script>
+let editIndex = null;
+
+function getData(){
+  return JSON.parse(localStorage.getItem("dgc_sliders")||"[]");
+}
+function saveData(d){
+  localStorage.setItem("dgc_sliders",JSON.stringify(d));
+}
+
+function load(){
+  const data=getData();
+  list.innerHTML="";
+
+  if(!data.length){
+    list.innerHTML="<small>No banners yet</small>";
+    return;
+  }
+
+  data.forEach((b,i)=>{
+    const div=document.createElement("div");
+    div.className="list-item";
+    div.innerHTML=`
+      <div>
+        ${b.featured?'<span class="badge featured">FEATURED</span>':''}
+        <span class="badge">${b.theme||"light"}</span>
+        <b>${b.title}</b><br>
+        <small>
+          ${b.game?`Game: ${b.game} | `:""}
+          Priority: ${b.priority||99}<br>
+          ${b.start?`From ${b.start}`:"Always"}
+          ${b.end?` → ${b.end}`:""}
+        </small>
+      </div>
+      <div class="actions">
+        <button onclick="editBanner(${i})">Edit</button>
+        <button class="danger" onclick="removeBanner(${i})">Delete</button>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function updatePreview(){
+  preview.style.backgroundImage = image.value ? `url('${image.value}')` : "";
+  preview.className = "preview " + theme.value;
+  pTitle.textContent = title.value || "Banner Title";
+  pSub.textContent = subtitle.value || "Banner subtitle";
+}
+
+function saveBanner(){
+  if(!image.value || !title.value){
+    alert("Image and Title are required");
+    return;
+  }
+
+  const data=getData();
+  const banner={
+    image:image.value,
+    title:title.value,
+    subtitle:subtitle.value,
+    link:link.value||"#",
+    theme:theme.value,
+    game:game.value||null,
+    start:start.value?start.value.replace("T"," "):null,
+    end:end.value?end.value.replace("T"," "):null,
+    priority:+priority.value||99,
+    featured:featured.checked
+  };
+
+  if(editIndex!==null){
+    data[editIndex]=banner;
+  }else{
+    data.push(banner);
+  }
+
+  saveData(data);
+  clearForm();
+  load();
+}
+
+function editBanner(i){
+  const b=getData()[i];
+  editIndex=i;
+
+  image.value=b.image;
+  title.value=b.title;
+  subtitle.value=b.subtitle||"";
+  link.value=b.link||"";
+  theme.value=b.theme||"light";
+  game.value=b.game||"";
+  start.value=b.start?b.start.replace(" ","T"):"";
+  end.value=b.end?b.end.replace(" ","T"):"";
+  priority.value=b.priority||"";
+  featured.checked=!!b.featured;
+
+  updatePreview();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+function removeBanner(i){
+  if(!confirm("Delete this banner?")) return;
+  const data=getData();
+  data.splice(i,1);
+  saveData(data);
+  load();
+}
+
+function clearForm(){
+  editIndex=null;
+  image.value=title.value=subtitle.value=link.value=game.value="";
+  start.value=end.value=priority.value="";
+  featured.checked=false;
+  updatePreview();
+}
+
+updatePreview();
+load();
+</script>
+
+</body>
+</html>

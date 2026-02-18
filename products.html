@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGC Admin Panel | Products</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#14000a;
+  color:#fff;
+}
+
+/* ================= HEADER ================= */
+header{
+  background:#1f0012;
+  border-bottom:1px solid #ff5fa2;
+  padding:14px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.header-title{
+  text-decoration:none;
+  color:#ff9ecb;
+  display:inline-block;
+}
+
+.header-title h2{
+  margin:0;
+  font-size:17px;
+  font-weight:600;
+}
+
+.header-title:hover{
+  text-decoration:underline;
+}
+
+.header-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+}
+
+/* ================= INPUTS & BUTTONS ================= */
+input,select{
+  background:#2a0016;
+  border:1px solid #ff5fa2;
+  color:#fff;
+  padding:7px 10px;
+  border-radius:12px;
+}
+
+button{
+  background:linear-gradient(135deg,#ff9ecb,#ff5fa2);
+  border:none;
+  padding:7px 14px;
+  border-radius:12px;
+  font-weight:bold;
+  cursor:pointer;
+  color:#000;
+}
+
+/* ================= LAYOUT ================= */
+.container{ padding:24px; }
+
+.table-wrapper{
+  background:#1a000d;
+  border-radius:16px;
+  box-shadow:0 0 20px #ff5fa244;
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:1100px;
+}
+
+th{
+  background:#240012;
+  color:#ff9ecb;
+  padding:14px;
+  font-size:13px;
+  text-align:left;
+}
+
+td{
+  padding:14px;
+  font-size:13px;
+  border-bottom:1px solid #2e0018;
+}
+
+tr:hover{
+  background:#2a0016;
+  cursor:pointer;
+}
+
+.money{
+  color:#ff7fb6;
+  font-weight:bold;
+}
+
+.pagination{
+  margin-top:12px;
+  display:flex;
+  gap:6px;
+}
+
+/* ================= PANEL & MODAL ================= */
+.panel,.modal-box{
+  background:#1a000d;
+  padding:20px;
+}
+
+.panel{
+  position:fixed;
+  top:0;
+  right:-420px;
+  width:400px;
+  height:100%;
+  transition:.3s;
+  z-index:100;
+  overflow:auto;
+}
+
+.panel.active{ right:0; }
+
+.modal{
+  position:fixed;
+  inset:0;
+  background:#000000aa;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:200;
+}
+
+.modal.active{ display:flex; }
+
+.modal-box{
+  width:420px;
+  border-radius:16px;
+  box-shadow:0 0 30px #ff5fa244;
+}
+
+.section{ margin-top:14px; }
+.section h4{ color:#ff9ecb; margin-bottom:6px; }
+
+.checkbox{
+  display:flex;
+  gap:6px;
+  font-size:13px;
+  margin-bottom:6px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== ADMIN SECURITY CHECK ===== -->
+<script>
+if(localStorage.getItem("adminLogged") !== "true"){
+  location.replace("adminlogin.html");
+}
+</script>
+
+<header>
+  <a href="admindashboard.html" class="header-title">
+    <h2>DGC Admin Panel – Products</h2>
+  </a>
+
+  <div class="header-actions">
+    <input id="searchInput" placeholder="Search..." onkeyup="applyFilters()">
+    <button onclick="openAdd()">+ ADD ITEM</button>
+    <button onclick="exportCSV()">EXPORT</button>
+    <button onclick="document.getElementById('importFile').click()">IMPORT</button>
+    <input type="file" id="importFile" accept=".csv" hidden>
+  </div>
+</header>
+
+<div class="container">
+  <div class="table-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Final Price</th>
+          <th>Cost</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody"></tbody>
+    </table>
+  </div>
+  <div class="pagination" id="pagination"></div>
+</div>
+
+<!-- ================= EDIT PANEL ================= -->
+<div class="panel" id="panel">
+<h3>Edit Item</h3>
+
+<label>Name</label>
+<input id="pName">
+
+<label>Category</label>
+<select id="pCategory">
+  <option>MLBB DIAMONDS</option>
+  <option>Steam Wallet</option>
+  <option>Verified Squad Rental</option>
+</select>
+
+<label>Base Price</label>
+<input id="pPrice" type="number">
+
+<label>Cost</label>
+<input id="pCost" type="number">
+
+<div class="section">
+<h4>Discount</h4>
+<select id="pDiscount" onchange="updateLivePrice()">
+  <option value="none">None</option>
+  <option value="bronze">Bronze (0.05%)</option>
+  <option value="gold">Gold (0.2%)</option>
+  <option value="promo">DGC Promo (44.47%)</option>
+</select>
+</div>
+
+<div class="section">
+<h4>Modifiers</h4>
+<label class="checkbox"><input type="checkbox" class="mod" data-price="10" onchange="updateLivePrice()"> Custom Amount (+₱10)</label>
+<label class="checkbox"><input type="checkbox" class="mod" data-price="15" onchange="updateLivePrice()"> Priority Processing (+₱15)</label>
+<label class="checkbox"><input type="checkbox" class="mod" data-price="0"> Requires Player ID</label>
+</div>
+
+<div class="section">
+<h4>Final Price</h4>
+<b id="finalPrice">₱0.00</b>
+</div>
+
+<button onclick="saveItem()">Save</button>
+</div>
+
+<!-- ================= ADD ITEM MODAL ================= -->
+<div class="modal" id="addModal">
+<div class="modal-box">
+<h3>Add Item</h3>
+
+<label>Name</label>
+<input id="aName">
+
+<label>Category</label>
+<select id="aCategory">
+  <option>MLBB DIAMONDS</option>
+  <option>Steam Wallet</option>
+  <option>Verified Squad Rental</option>
+</select>
+
+<label>Base Price</label>
+<input id="aPrice" type="number">
+
+<label>Cost</label>
+<input id="aCost" type="number">
+
+<button onclick="addItem()">Add</button>
+<button onclick="closeAdd()">Cancel</button>
+</div>
+</div>
+
+<script>
+const discounts={ none:0, bronze:0.0005, gold:0.002, promo:0.4447 };
+
+let items=[{
+  name:"112 Diamonds",
+  category:"MLBB DIAMONDS",
+  price:104,
+  cost:84.62,
+  discount:"none",
+  modifiers:[]
+}];
+
+let filtered=[...items],page=1,perPage=5,current=null;
+
+function computeFinalPrice(item){
+  let discountAmount=item.price*discounts[item.discount];
+  let modTotal=item.modifiers.reduce((s,m)=>s+m.price,0);
+  return (item.price-discountAmount+modTotal).toFixed(2);
+}
+
+function render(){
+  tableBody.innerHTML="";
+  filtered.slice((page-1)*perPage,page*perPage).forEach((i,idx)=>{
+    tableBody.innerHTML+=`
+    <tr onclick="edit(${idx})">
+      <td>${i.name}</td>
+      <td>${i.category}</td>
+      <td class="money">₱${computeFinalPrice(i)}</td>
+      <td>₱${i.cost}</td>
+    </tr>`;
+  });
+
+  pagination.innerHTML="";
+  for(let i=1;i<=Math.ceil(filtered.length/perPage);i++){
+    pagination.innerHTML+=`<button onclick="page=${i};render()">${i}</button>`;
+  }
+}
+
+function applyFilters(){
+  filtered=items.filter(i=>i.name.toLowerCase().includes(searchInput.value.toLowerCase()));
+  page=1;
+  render();
+}
+
+function edit(i){
+  current=i;
+  panel.classList.add("active");
+  let item=filtered[i];
+  pName.value=item.name;
+  pCategory.value=item.category;
+  pPrice.value=item.price;
+  pCost.value=item.cost;
+  pDiscount.value=item.discount;
+  document.querySelectorAll(".mod").forEach(m=>m.checked=false);
+  item.modifiers.forEach(mod=>{
+    document.querySelectorAll(".mod").forEach(m=>{
+      if(+m.dataset.price===mod.price) m.checked=true;
+    });
+  });
+  updateLivePrice();
+}
+
+function updateLivePrice(){
+  let base=+pPrice.value||0;
+  let discount=discounts[pDiscount.value];
+  let modTotal=0;
+  document.querySelectorAll(".mod:checked").forEach(m=>modTotal+=+m.dataset.price);
+  finalPrice.innerText="₱"+(base-(base*discount)+modTotal).toFixed(2);
+}
+
+function saveItem(){
+  let mods=[];
+  document.querySelectorAll(".mod:checked").forEach(m=>{
+    mods.push({price:+m.dataset.price});
+  });
+  Object.assign(filtered[current],{
+    name:pName.value,
+    category:pCategory.value,
+    price:+pPrice.value,
+    cost:+pCost.value,
+    discount:pDiscount.value,
+    modifiers:mods
+  });
+  panel.classList.remove("active");
+  render();
+}
+
+function openAdd(){ addModal.classList.add("active"); }
+function closeAdd(){ addModal.classList.remove("active"); }
+
+function addItem(){
+  items.push({
+    name:aName.value,
+    category:aCategory.value,
+    price:+aPrice.value,
+    cost:+aCost.value,
+    discount:"none",
+    modifiers:[]
+  });
+  closeAdd();
+  applyFilters();
+}
+
+function exportCSV(){
+  let csv="Name,Category,Price,Cost\n";
+  items.forEach(i=>csv+=`${i.name},${i.category},${i.price},${i.cost}\n`);
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([csv]));
+  a.download="products.csv";
+  a.click();
+}
+
+importFile.addEventListener("change",()=>{
+  let f=importFile.files[0];
+  if(!f) return;
+  let r=new FileReader();
+  r.onload=e=>{
+    e.target.result.split("\n").slice(1).forEach(l=>{
+      let [n,c,p,co]=l.split(",");
+      if(n) items.push({name:n,category:c,price:+p,cost:+co,discount:"none",modifiers:[]});
+    });
+    applyFilters();
+  };
+  r.readAsText(f);
+});
+
+applyFilters();
+</script>
+
+</body>
+</html>

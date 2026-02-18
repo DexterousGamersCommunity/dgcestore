@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DGC E-Store | Member Sign In</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Main CSS -->
+    <link rel="stylesheet" href="assets/css/style.css">
+
+    <!-- Favicon (optional) -->
+    <link rel="icon" href="assets/images/logos/logo.png">
+</head>
+
+<body class="auth-body">
+
+    <div class="auth-container">
+        <div class="auth-card">
+
+            <div class="auth-header">
+                <img src="assets/images/logos/logo.png" alt="DGC Logo" class="auth-logo">
+                <h2>Member Sign In</h2>
+                <p>Welcome back to DGC E-Store</p>
+            </div>
+
+            <form id="signinForm">
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required>
+                </div>
+
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" id="remember">
+                        Remember me
+                    </label>
+                    <a href="#">Forgot Password?</a>
+                </div>
+
+                <button type="submit" class="btn-primary">Sign In</button>
+
+            </form>
+
+            <div class="auth-footer">
+                <p>Don't have an account?</p>
+                <a href="signupmember.html" class="btn-secondary">Create Account</a>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Main JS -->
+    <script src="assets/js/main.js"></script>
+
+    <script>
+        // Simple LocalStorage Login (Demo Only)
+        document.getElementById("signinForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+
+            const storedUser = JSON.parse(localStorage.getItem("dgcUser"));
+
+            if (storedUser && storedUser.email === email && storedUser.password === password) {
+                alert("Login Successful!");
+                localStorage.setItem("dgcLoggedIn", "true");
+                window.location.href = "index.html";
+            } else {
+                alert("Invalid email or password!");
+            }
+        });
+    </script>
+
+</body>
+</html>

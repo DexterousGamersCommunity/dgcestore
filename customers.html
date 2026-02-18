@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGC Admin Panel | Customers</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#14000a;
+  color:#fff;
+}
+
+/* ================= HEADER ================= */
+header{
+  padding:14px 22px;
+  background:#1f0012;
+  border-bottom:1px solid #ff5fa2;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.header-title{
+  text-decoration:none;
+  color:#ff9ecb;
+  display:inline-block;
+}
+
+.header-title h2{
+  margin:0;
+  font-size:17px;
+  font-weight:600;
+}
+
+.header-title:hover{
+  text-decoration:underline;
+}
+
+/* HEADER ACTIONS */
+.header-actions{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.search{
+  background:#2a0016;
+  border:1px solid #ff5fa2;
+  color:#fff;
+  padding:7px 12px;
+  border-radius:14px;
+  outline:none;
+  width:200px;
+}
+
+.add-btn{
+  background:linear-gradient(135deg,#ff9ecb,#ff5fa2);
+  border:none;
+  padding:7px 14px;
+  border-radius:14px;
+  font-weight:bold;
+  cursor:pointer;
+  color:#000;
+}
+
+/* ================= LAYOUT ================= */
+.main{
+  display:grid;
+  grid-template-columns:1.3fr .7fr;
+  gap:20px;
+  padding:24px;
+  min-height:calc(100vh - 70px);
+}
+
+/* ================= TABLE ================= */
+.table-wrapper{
+  background:#1a000d;
+  border-radius:16px;
+  box-shadow:0 0 20px #ff5fa244;
+  overflow-x:auto;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+
+th{
+  background:#240012;
+  color:#ff9ecb;
+  padding:14px;
+  font-size:13px;
+  text-align:left;
+  border-bottom:1px solid #ff5fa2;
+}
+
+td{
+  padding:14px;
+  font-size:13px;
+  border-bottom:1px solid #2e0018;
+}
+
+tr:hover{
+  background:#2a0016;
+}
+
+.name{
+  color:#ff9ecb;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.name:hover{
+  text-decoration:underline;
+}
+
+.money{ color:#ff7fb6; font-weight:bold; }
+.points{ color:#ffb3d6; font-weight:bold; }
+
+/* ================= PROFILE ================= */
+.profile{
+  background:#1a000d;
+  border-radius:16px;
+  padding:20px;
+  box-shadow:0 0 20px #ff5fa244;
+  border:2px solid transparent;
+}
+
+.profile.active{
+  border-color:#ff5fa2;
+}
+
+.avatar{
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  background:#ff5fa2;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:28px;
+  margin-bottom:10px;
+}
+
+.profile h3{
+  margin:0;
+  color:#ff9ecb;
+}
+
+small{
+  color:#f3b5d1;
+}
+
+/* STATS */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:12px;
+  margin:16px 0;
+}
+
+.stat{
+  background:#240012;
+  padding:12px;
+  border-radius:12px;
+  font-size:13px;
+}
+
+/* FORM */
+label{
+  font-size:12px;
+  color:#f3b5d1;
+}
+
+input{
+  width:100%;
+  margin-top:4px;
+  margin-bottom:12px;
+  padding:8px;
+  border-radius:10px;
+  border:none;
+}
+
+.save-btn{
+  width:100%;
+  background:linear-gradient(135deg,#ff9ecb,#ff5fa2);
+  border:none;
+  padding:10px;
+  border-radius:12px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* MOBILE */
+@media(max-width:900px){
+  .main{
+    grid-template-columns:1fr;
+  }
+  .search{
+    width:140px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== ADMIN SECURITY CHECK ===== -->
+<script>
+if(localStorage.getItem("adminLogged") !== "true"){
+  location.replace("adminlogin.html");
+}
+</script>
+
+<header>
+  <a href="admindashboard.html" class="header-title">
+    <h2>DGC Admin Panel – Customers</h2>
+  </a>
+
+  <div class="header-actions">
+    <input class="search" id="searchInput" placeholder="Search customer..." onkeyup="searchCustomer()">
+    <button class="add-btn" onclick="addCustomer()">+ Add Customer</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- TABLE -->
+  <div class="table-wrapper">
+    <table id="customerTable">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Customer Name</th>
+          <th>Orders</th>
+          <th>Total Purchase</th>
+          <th>Points</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr onclick="openProfile('Jose Jezreel','jose@email.com',6,7047.32,0.71)">
+          <td>#1</td>
+          <td class="name">Jose Jezreel</td>
+          <td>6</td>
+          <td class="money">PHP 7,047.32</td>
+          <td class="points">0.71</td>
+        </tr>
+
+        <tr onclick="openProfile('Maria Santos','maria@email.com',4,5320,0.53)">
+          <td>#2</td>
+          <td class="name">Maria Santos</td>
+          <td>4</td>
+          <td class="money">PHP 5,320.00</td>
+          <td class="points">0.53</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="profile" id="profile">
+    <div class="avatar">👤</div>
+    <h3 id="pName">Select a customer</h3>
+    <small>Customer Profile</small>
+
+    <div class="stats">
+      <div class="stat">Orders: <b id="pOrders">-</b></div>
+      <div class="stat">Total Spent: <b id="pSpent">-</b></div>
+      <div class="stat">Points: <b id="pPoints">-</b></div>
+      <div class="stat">Status: Active</div>
+    </div>
+
+    <label>Name</label>
+    <input id="editName">
+
+    <label>Email</label>
+    <input id="editEmail">
+
+    <label>Loyalty Points</label>
+    <input id="editPoints" type="number" step="0.01">
+
+    <button class="save-btn" onclick="saveProfile()">Save Changes</button>
+  </div>
+
+</div>
+
+<script>
+function addCustomer(){
+  alert("Add customer form (demo)");
+}
+
+function searchCustomer(){
+  let input=document.getElementById("searchInput").value.toLowerCase();
+  document.querySelectorAll("#customerTable tbody tr").forEach(row=>{
+    row.style.display=row.querySelector(".name").innerText.toLowerCase().includes(input)?"":"none";
+  });
+}
+
+function openProfile(name,email,orders,spent,points){
+  profile.classList.add("active");
+  pName.innerText=name;
+  pOrders.innerText=orders;
+  pSpent.innerText="PHP "+spent.toLocaleString();
+  pPoints.innerText=points;
+  editName.value=name;
+  editEmail.value=email;
+  editPoints.value=points;
+}
+
+function saveProfile(){
+  alert("Customer details updated (demo only)");
+}
+
+openProfile('Jose Jezreel','jose@email.com',6,7047.32,0.71);
+</script>
+
+</body>
+</html>

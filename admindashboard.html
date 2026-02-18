@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGC Admin Dashboard</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#14000a;
+  color:#fff;
+}
+
+/* ================= HEADER ================= */
+header{
+  padding:18px 25px;
+  background:#1f0012;
+  border-bottom:1px solid #ff5fa2;
+  box-shadow:0 0 20px #ff5fa255;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+header h2{
+  margin:0;
+  color:#ff9ecb;
+  font-size:20px;
+}
+
+/* ================= BUTTON ================= */
+button{
+  background:linear-gradient(135deg,#ff9ecb,#ff5fa2);
+  border:none;
+  color:#000;
+  padding:8px 16px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+  transition:.2s;
+}
+
+button:hover{
+  filter:brightness(1.1);
+}
+
+/* ================= CONTENT ================= */
+.container{
+  padding:30px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:20px;
+}
+
+/* ================= CARDS ================= */
+.card{
+  background:#240012;
+  border:1px solid #ff5fa2;
+  border-radius:18px;
+  padding:25px;
+  text-align:center;
+  cursor:pointer;
+  transition:.25s;
+  box-shadow:0 0 15px #ff5fa244;
+}
+
+.card:hover{
+  background:#2e0018;
+  transform:translateY(-5px);
+  box-shadow:0 0 30px #ff5fa299;
+}
+
+.card h3{
+  margin:0 0 10px;
+  color:#ff9ecb;
+}
+
+/* ================= NOTES ================= */
+.notes{
+  grid-column:1/-1;
+  background:#1a000d;
+  border:1px solid #ff9ecb;
+  border-radius:18px;
+  padding:25px;
+  box-shadow:0 0 20px #ff9ecb44;
+}
+
+.notes h3{
+  margin-top:0;
+  color:#ff9ecb;
+}
+
+.notes ul{
+  padding-left:20px;
+  line-height:1.6;
+}
+
+/* ================= MOBILE ================= */
+@media(max-width:600px){
+  header{
+    flex-direction:column;
+    gap:12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ================= SECURITY CHECK ================= -->
+<script>
+if(localStorage.getItem("adminLogged") !== "true"){
+  location.replace("adminlogin.html");
+}
+</script>
+
+<header>
+  <h2>DGC eStore – Admin Panel</h2>
+  <button onclick="logout()">Logout</button>
+</header>
+
+<div class="container">
+
+  <div class="card" onclick="goOrders()">
+    <h3>View Orders</h3>
+    <p>Check & manage all orders</p>
+  </div>
+
+  <div class="card" onclick="goProducts()">
+    <h3>Products</h3>
+    <p>Manage items & pricing</p>
+  </div>
+
+  <div class="card" onclick="goCustomers()">
+    <h3>Customers</h3>
+    <p>View customer list</p>
+  </div>
+
+  <div class="notes">
+    <h3>Important Admin Notes</h3>
+    <ul>
+      <li>Always verify payment receipts before approving orders.</li>
+      <li>Rejected orders must include a clear reason.</li>
+      <li>Export orders daily for backup.</li>
+      <li>Do not clear browser storage unless backed up.</li>
+      <li>Always logout on shared devices.</li>
+    </ul>
+  </div>
+
+</div>
+
+<script>
+function goOrders(){
+  location.href = "view-orders.html";
+}
+
+function goProducts(){
+  location.href = "products.html";
+}
+
+function goCustomers(){
+  location.href = "customers.html";
+}
+
+function logout(){
+  localStorage.removeItem("adminLogged");
+  location.replace("adminlogin.html");
+}
+</script>
+
+</body>
+</html>

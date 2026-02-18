@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGC eStore | Receipt</title>
+
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+:root{
+  --teal:#0b5f63;
+  --teal-light:#18cfd4;
+  --gray:#cfd8dc;
+  --success:#1fd286;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#061b1d;
+  display:flex;
+  justify-content:center;
+  padding:20px;
+}
+.receipt{
+  background:#fff;
+  width:100%;
+  max-width:420px;
+  border-radius:18px 18px 0 0;
+  overflow:hidden;
+}
+.header{
+  background:linear-gradient(135deg,var(--teal),var(--teal-light));
+  color:#fff;
+  text-align:center;
+  padding:24px 16px;
+}
+.header h1{margin:0;font-size:26px}
+.header p{margin-top:6px;font-size:14px;opacity:.9}
+
+.status{
+  display:flex;
+  justify-content:space-between;
+  margin:20px 0 10px;
+}
+.step{text-align:center;font-size:12px;color:#666}
+.step .circle{
+  width:38px;height:38px;border-radius:50%;
+  background:var(--gray);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:18px;margin:0 auto 6px;
+}
+.step.active{color:#000}
+.step.active .circle{
+  background:var(--success);
+  animation:pulse 1.6s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(31,210,134,.8)}
+  70%{box-shadow:0 0 0 12px rgba(31,210,134,0)}
+  100%{box-shadow:0 0 0 0 rgba(31,210,134,0)}
+}
+
+.content{padding:20px}
+.row{
+  display:flex;
+  justify-content:space-between;
+  margin:8px 0;
+  font-size:14px;
+}
+.badge{
+  background:#1ea35b;
+  color:#fff;
+  padding:3px 10px;
+  border-radius:20px;
+  font-size:11px;
+}
+hr{
+  border:none;
+  border-top:1px dashed #ccc;
+  margin:14px 0;
+}
+.total{font-weight:bold;font-size:18px}
+.footer{
+  text-align:center;
+  padding:18px;
+  font-size:13px;
+  color:var(--teal);
+}
+.barcode svg{width:100%;height:60px}
+.btn{
+  width:100%;
+  margin-top:10px;
+  padding:14px;
+  border-radius:12px;
+  border:1px solid var(--teal-light);
+  background:transparent;
+  color:var(--teal-light);
+  cursor:pointer;
+}
+.btn.primary{
+  background:var(--teal-light);
+  border:none;
+  color:#000;
+}
+</style>
+</head>
+
+<body>
+
+<div class="receipt" id="receipt">
+
+  <div class="header">
+    <h1>DGC eStore</h1>
+    <p>Your order has been processed</p>
+  </div>
+
+  <div class="content">
+
+    <div class="status">
+      <div class="step" id="step-paid"><div class="circle">✓</div>Paid</div>
+      <div class="step" id="step-processing"><div class="circle">✓</div>Processing</div>
+      <div class="step" id="step-completed"><div class="circle">✓</div>Completed</div>
+    </div>
+
+    <div class="row">
+      <b>Transaction Status</b>
+      <span class="badge">Success</span>
+    </div>
+
+    <hr>
+
+    <div class="row"><b>Customer</b><span id="customer"></span></div>
+    <div class="row"><b>Order</b><span id="order"></span></div>
+    <div class="row"><b>Quantity</b><span id="qty"></span></div>
+    <div class="row"><b>Payment</b><span id="payment"></span></div>
+
+    <hr>
+
+    <div class="row total">
+      <span>Total</span>
+      <span id="total"></span>
+    </div>
+
+    <div class="row">
+      <span id="date"></span>
+      <span id="orderId"></span>
+    </div>
+
+    <div class="footer">
+      <span id="statusMessage"></span>
+      <div class="barcode"><svg id="barcode"></svg></div>
+      <b>THANK YOU!</b>
+    </div>
+
+    <button class="btn primary" onclick="downloadReceipt()">Download Image Receipt</button>
+    <button class="btn" onclick="notifyMessenger()">Notify via Messenger</button>
+    <button class="btn" onclick="goBack()">Back to Store</button>
+
+  </div>
+</div>
+
+<script>
+// ===== LOAD DATA =====
+const raw = localStorage.getItem("orderData");
+const orderId = localStorage.getItem("currentOrderId");
+
+if(!raw || !orderId){
+  alert("No order found.");
+  location.href="order.html";
+}
+
+const data = JSON.parse(raw);
+customer.textContent = data.customer;
+order.textContent = data.product;
+qty.textContent = data.quantity;
+payment.textContent = data.payment;
+total.textContent = "₱"+data.total;
+document.getElementById("orderId").textContent = "#"+orderId;
+date.textContent = new Date().toLocaleString();
+
+// ===== BARCODE =====
+JsBarcode("#barcode", orderId, {displayValue:false});
+
+// ===== STATUS =====
+const paidStep = document.getElementById("step-paid");
+const processingStep = document.getElementById("step-processing");
+const completedStep = document.getElementById("step-completed");
+const statusMessage = document.getElementById("statusMessage");
+
+function applyStatus(status){
+  paidStep.classList.remove("active");
+  processingStep.classList.remove("active");
+  completedStep.classList.remove("active");
+
+  if(status==="paid"){
+    paidStep.classList.add("active");
+    statusMessage.textContent="Payment received. Waiting for confirmation.";
+  }
+  if(status==="processing"){
+    paidStep.classList.add("active");
+    processingStep.classList.add("active");
+    statusMessage.textContent="Your order is being processed.";
+  }
+  if(status==="completed"){
+    paidStep.classList.add("active");
+    processingStep.classList.add("active");
+    completedStep.classList.add("active");
+    statusMessage.textContent="Top-up success, kindly check in game.";
+  }
+}
+
+// ===== REAL-TIME UPDATE =====
+let lastStatus = localStorage.getItem("orderStatus") || "paid";
+applyStatus(lastStatus);
+
+setInterval(()=>{
+  const s = localStorage.getItem("orderStatus") || "paid";
+  if(s !== lastStatus){
+    lastStatus = s;
+    applyStatus(s);
+  }
+},3000);
+
+// ===== MESSENGER (PAGE) =====
+function notifyMessenger(){
+  const summary =
+`🧾 DGC eStore Order
+
+Order ID: ${orderId}
+Customer: ${data.customer}
+Order: ${data.product}
+Quantity: ${data.quantity}
+Payment: ${data.payment}
+Total: ₱${data.total}
+Status: ${lastStatus.toUpperCase()}`;
+
+  const url =
+    "https://m.me/dexterousgc?ref=" +
+    encodeURIComponent(summary);
+
+  window.open(url,"_blank");
+}
+
+// ===== IMAGE RECEIPT =====
+function downloadReceipt(){
+  html2canvas(document.getElementById("receipt")).then(c=>{
+    const a=document.createElement("a");
+    a.download="DGC-Receipt-"+orderId+".png";
+    a.href=c.toDataURL();
+    a.click();
+  });
+}
+
+// auto-generate once
+setTimeout(downloadReceipt,1200);
+
+function goBack(){location.href="index.html";}
+</script>
+
+</body>
+</html>
