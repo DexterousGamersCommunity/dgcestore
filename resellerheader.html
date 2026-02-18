@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>DGC Admin Header</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<style>
+:root{
+  --teal:#0e5f66;
+  --teal-light:#1aa3ad;
+  --glass-bg:rgba(26,163,173,.18);
+  --text-main:#ffffff;
+}
+
+/* RESET */
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* BODY */
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI";
+  background:url("adminbackground.png") center/cover fixed no-repeat;
+  color:var(--text-main);
+}
+
+a{text-decoration:none;color:inherit}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:rgba(14,95,102,.2)}
+::-webkit-scrollbar-thumb{
+  background:linear-gradient(180deg,#0e5f66,#1aa3ad);
+  border-radius:10px;
+}
+
+/* LOADER */
+#loader{
+  position:fixed;
+  inset:0;
+  background:var(--teal-light);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+  transition:.4s ease;
+}
+#loader.fade-out{opacity:0;visibility:hidden}
+.loader-content img{width:190px;margin-bottom:18px}
+
+.arc-spinner{
+  width:38px;height:38px;
+  border-radius:50%;
+  border:4px solid rgba(255,255,255,.25);
+  border-top-color:#fff;
+  border-left-color:transparent;
+  border-bottom-color:transparent;
+  animation:spin .65s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* HEADER */
+header{
+  position:sticky;
+  top:0;
+  z-index:1000;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 26px;
+  backdrop-filter:blur(18px);
+  background:linear-gradient(270deg,#0e5f66,#1aa3ad,#2fd6e2);
+  background-size:400% 400%;
+  animation:flow 12s ease infinite;
+  box-shadow:0 2px 18px rgba(14,95,102,.6);
+}
+@keyframes flow{
+  0%{background-position:0%}
+  50%{background-position:100%}
+  100%{background-position:0%}
+}
+
+.header-left{
+  display:flex;
+  align-items:center;
+  gap:14px;
+}
+.header-left img{height:46px}
+
+.motto{font-size:13px}
+
+/* SEARCH */
+.search-wrapper{
+  position:relative;
+  display:inline-flex;
+  align-items:center;
+}
+.search-wrapper input{
+  width:0;
+  opacity:0;
+  padding:8px 12px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+  margin-left:8px;
+  transition:.35s;
+}
+.search-wrapper:hover input,
+.search-wrapper input:focus{
+  width:220px;
+  opacity:1;
+}
+
+.search-results{
+  position:absolute;
+  top:48px;
+  left:0;
+  width:220px;
+  background:rgba(0,0,0,.75);
+  backdrop-filter:blur(10px);
+  border-radius:12px;
+  overflow:hidden;
+  display:none;
+}
+.search-results a{
+  display:block;
+  padding:10px 12px;
+  font-size:13px;
+}
+.search-results a:hover{background:rgba(26,163,173,.35)}
+
+/* ICONS */
+.header-icons a{
+  width:42px;height:42px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:14px;
+  margin-left:10px;
+  transition:.3s;
+}
+.header-icons i{font-size:18px;color:#fff}
+.header-icons a:hover{
+  box-shadow:0 0 14px rgba(26,163,173,.8);
+}
+.header-icons a.active{
+  animation:pulse 1.8s infinite;
+}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 rgba(26,163,173,.8)}
+  70%{box-shadow:0 0 22px rgba(26,163,173,1)}
+  100%{box-shadow:0 0 0 rgba(26,163,173,.6)}
+}
+</style>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="loader-content">
+    <img src="dgcestorelogo.png">
+    <div class="arc-spinner"></div>
+  </div>
+</div>
+
+<header>
+  <div class="header-left">
+    <a href="admindashboard.html"><img src="dgcestorelogo.png"></a>
+    <div class="motto" id="motto"></div>
+  </div>
+
+  <div class="header-icons">
+
+    <!-- SEARCH -->
+    <div class="search-wrapper">
+      <a><i class="fas fa-magnifying-glass"></i></a>
+      <input type="text" id="searchInput" placeholder="Search page...">
+      <div class="search-results" id="results"></div>
+    </div>
+
+    <a href="admindashboard.html"><i class="fas fa-home"></i></a>
+    <a href="admintournamentdashboard.html"><i class="fas fa-trophy"></i></a>
+    <a href="admincalendar.html"><i class="fas fa-calendar"></i></a>
+    <a href="admingiftingordersummary.html"><i class="fas fa-gift"></i></a>
+    <a class="active"><i class="fas fa-ranking-star"></i></a>
+    <a href="admintlobbyproductupdate.html"><i class="fas fa-users"></i></a>
+  </div>
+</header>
+
+<script>
+/* LOADER */
+window.addEventListener("load",()=>setTimeout(()=>loader.classList.add("fade-out"),250))
+
+/* MOTTO */
+const titles=[
+ ['fas fa-sparkle','Kamusta Ka?'],
+ ['fas fa-smiling','Make your self Happy, Buy Now'],
+ ['fas fa-shopping cart','Style your Game'],
+ ['fas fa-cash','Dream skin? Cash in Now'],
+]
+const t=titles[Math.floor(Math.random()*titles.length)]
+motto.innerHTML=`<i class="${t[0]}"></i> ${t[1]}`
+
+/* SEARCH DATA */
+const pages=[
+ {name:"Dashboard",url:"admindashboard.html"},
+ {name:"Tournament",url:"admintournamentdashboard.html"},
+ {name:"Calendar",url:"admincalendar.html"},
+ {name:"Gifting Order",url:"admingiftingordersummary.html"},
+ {name:"Lobby Update",url:"admintlobbyproductupdate.html"}
+]
+
+searchInput.addEventListener("input",()=>{
+  const v=searchInput.value.toLowerCase()
+  results.innerHTML=""
+  if(!v){results.style.display="none";return}
+  results.style.display="block"
+  pages.filter(p=>p.name.toLowerCase().includes(v))
+    .forEach(p=>{
+      results.innerHTML+=`<a href="${p.url}">${p.name}</a>`
+    })
+})
+</script>
+
+</body>
+</html>

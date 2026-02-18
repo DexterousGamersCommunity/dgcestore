@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DGC eStore – Verified Squad Order</title>
+
+<style>
+:root {
+  --bg-main: #071316;
+  --bg-panel: #0b1f24;
+  --bg-card: #0e2a30;
+
+  --teal: #00e0c6;
+  --teal-soft: #00bfa5;
+  --teal-glow: rgba(0,224,198,.35);
+
+  --text-main: #e8fffc;
+  --text-muted: #9fd6cf;
+
+  --danger: #ff6b6b;
+}
+
+/* RESET */
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: radial-gradient(circle at top, #0c2a30, var(--bg-main));
+  color: var(--text-main);
+}
+
+/* HEADER */
+.header {
+  background: linear-gradient(90deg, #041114, #052b30);
+  border-bottom: 1px solid rgba(255,255,255,.05);
+}
+
+.header-inner {
+  max-width: 1300px;
+  margin: auto;
+  padding: 16px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--teal);
+  text-decoration: none;
+}
+
+.logo:hover {
+  text-shadow: 0 0 12px var(--teal-glow);
+}
+
+.nav a {
+  color: var(--text-muted);
+  text-decoration: none;
+  margin-left: 18px;
+  font-size: 14px;
+}
+
+.nav a:hover {
+  color: var(--teal);
+}
+
+/* LAYOUT */
+.container {
+  max-width: 1250px;
+  margin: auto;
+  padding: 40px 20px;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 26px;
+}
+
+/* PRODUCT CARD */
+.product-card {
+  background: linear-gradient(180deg, #0f343a, var(--bg-card));
+  border-radius: 18px;
+  padding: 20px;
+  box-shadow: 0 15px 40px rgba(0,0,0,.45);
+}
+
+.product-card img {
+  width: 100%;
+  border-radius: 14px;
+  margin-bottom: 14px;
+}
+
+.product-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.product-meta {
+  font-size: 13px;
+  color: var(--text-muted);
+  line-height: 1.7;
+}
+
+/* ORDER PANEL */
+.panel {
+  background: linear-gradient(180deg, #081f24, var(--bg-panel));
+  border-radius: 18px;
+  padding: 26px;
+  box-shadow: 0 18px 50px rgba(0,0,0,.55);
+}
+
+/* WARNING */
+.warning {
+  color: var(--danger);
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+/* INPUTS */
+.inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.inputs input {
+  background: #041519;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 28px;
+  padding: 14px 18px;
+  color: var(--text-main);
+  outline: none;
+}
+
+.inputs input:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 2px var(--teal-glow);
+}
+
+/* SQUADS */
+.squad-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px,1fr));
+  gap: 14px;
+}
+
+.squad {
+  background: linear-gradient(180deg, #072328, #061a1e);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: .25s;
+}
+
+.squad:hover {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 2px var(--teal-glow);
+}
+
+.squad.selected {
+  border-color: var(--teal);
+  background: linear-gradient(180deg, #0a3a40, #06262b);
+}
+
+.squad h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--teal);
+}
+
+.squad small {
+  display: block;
+  font-size: 12px;
+  color: var(--text-muted);
+  margin: 4px 0;
+}
+
+.squad span {
+  font-size: 12px;
+  opacity: .9;
+}
+
+/* DURATION */
+.duration {
+  margin-top: 30px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255,255,255,.08);
+}
+
+.duration h3 {
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.duration p {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.duration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px,1fr));
+  gap: 14px;
+}
+
+.duration-btn {
+  background: linear-gradient(180deg, #071e22, #06171a);
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.duration-btn:hover {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 2px var(--teal-glow);
+}
+
+.duration-btn span {
+  color: var(--teal);
+  font-weight: 700;
+}
+
+/* FOOTER */
+.footer {
+  background: linear-gradient(180deg, #041215, #020a0c);
+  border-top: 1px solid rgba(255,255,255,.05);
+  margin-top: 60px;
+}
+
+.footer-inner {
+  max-width: 1250px;
+  margin: auto;
+  padding: 28px 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.footer-inner h4 {
+  color: var(--teal);
+  margin-bottom: 6px;
+}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .container { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="header-inner">
+    <a href="index.html" class="logo">DGC eStore</a>
+    <nav class="nav">
+      <a href="index.html">Home</a>
+      <a href="#">Games</a>
+      <a href="#">Orders</a>
+      <a href="#">Support</a>
+    </nav>
+  </div>
+</header>
+
+<div class="container">
+
+  <div class="product-card">
+    <img src="https://via.placeholder.com/400x220/00e0c6/002d2a?text=MLBB+Verified+Squads">
+    <div class="product-title">Mobile Legends | Verified Squads</div>
+    <div class="product-meta">
+      ✔ Fast & Secure<br>
+      ⏱ 10 mins – 24 hrs<br>
+      🌍 Global Region
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="warning">⚠ Make sure your Player ID & Zone ID are correct.</div>
+
+    <div class="inputs">
+      <input placeholder="Enter User ID">
+      <input placeholder="Zone ID">
+    </div>
+
+    <div class="squad-grid" id="squadGrid"></div>
+
+    <div class="duration">
+      <h3>SELECT DURATION</h3>
+      <p>Selected Squad: <strong id="selectedSquad">None</strong></p>
+
+      <div class="duration-grid">
+        <div class="duration-btn"><strong>7 DAYS</strong><span>₱299</span></div>
+        <div class="duration-btn"><strong>14 DAYS</strong><span>₱499</span></div>
+        <div class="duration-btn"><strong>1 MONTH</strong><span>₱799</span></div>
+        <div class="duration-btn"><strong>3 MONTHS</strong><span>₱2,199</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <h4>DGC eStore</h4>
+    <p>© 2026 • Fast & Secure Game Top-Up</p>
+  </div>
+</footer>
+
+<script>
+fetch("adminvsquaddetails.html")
+  .then(r => r.text())
+  .then(html => {
+    const doc = new DOMParser().parseFromString(html,"text/html");
+    const data = JSON.parse(doc.getElementById("squadData").textContent);
+    const grid = document.getElementById("squadGrid");
+    const label = document.getElementById("selectedSquad");
+
+    data.forEach(s => {
+      const d = document.createElement("div");
+      d.className = "squad";
+      d.innerHTML = `
+        <h4>${s.short}</h4>
+        <small>${s.name}</small>
+        <span>${s.slots} Slot${s.slots>1?"s":""}</span>
+      `;
+      d.onclick = () => {
+        document.querySelectorAll(".squad").forEach(x=>x.classList.remove("selected"));
+        d.classList.add("selected");
+        label.textContent = s.short;
+      };
+      grid.appendChild(d);
+    });
+  });
+</script>
+
+</body>
+</html>

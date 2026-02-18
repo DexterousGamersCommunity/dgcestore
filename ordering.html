@@ -1,0 +1,302 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DGC eStore | Order</title>
+
+<style>
+:root{
+  --teal:#0b5f63;
+  --teal-light:#18cfd4;
+}
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#061b1d;
+  color:#fff;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* HEADER */
+header{
+  position:sticky;
+  top:0;
+  z-index:999;
+  background:#000c;
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--teal-light);
+  padding:12px 20px;
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.logo-wrap{display:flex;align-items:center;gap:10px;cursor:pointer}
+.logo{height:40px}
+.search-bar{flex:1;max-width:420px}
+.search-bar input{
+  width:100%;
+  padding:10px 14px;
+  border-radius:12px;
+  border:none;
+  outline:none;
+}
+
+/* BUTTON */
+button{
+  background:transparent;
+  border:1px solid var(--teal-light);
+  color:var(--teal-light);
+  padding:12px 18px;
+  border-radius:10px;
+  cursor:pointer;
+  width:100%;
+}
+
+/* CONTENT */
+.section{padding:20px;flex:1}
+.game-layout{
+  max-width:1100px;
+  margin:auto;
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:20px;
+}
+.card{
+  background:#000c;
+  border:1px solid var(--teal-light);
+  border-radius:18px;
+  padding:18px;
+}
+input{
+  width:100%;
+  padding:10px;
+  border-radius:8px;
+  border:none;
+  margin-top:6px;
+}
+
+/* PACKAGES */
+#packages{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.item-card{
+  background:#000b;
+  border:1px solid rgba(24,207,212,.35);
+  border-radius:16px;
+  padding:16px;
+  cursor:pointer;
+}
+.item-card.active{
+  border-color:var(--teal-light);
+  background:rgba(24,207,212,.2);
+}
+.item-price{text-align:right;font-weight:bold;color:var(--teal-light)}
+
+/* MODAL */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:#000c;
+  backdrop-filter:blur(6px);
+  z-index:9999;
+}
+.modal-box{
+  max-width:420px;
+  background:#061b1d;
+  border:1px solid var(--teal-light);
+  border-radius:18px;
+  padding:20px;
+  margin:8% auto;
+  text-align:center;
+}
+.modal img{max-width:220px;margin:12px auto}
+
+/* FOOTER */
+footer{
+  border-top:1px solid rgba(24,207,212,.3);
+  background:#000c;
+  padding:18px;
+  text-align:center;
+  font-size:14px;
+  color:#9adfe2;
+}
+footer b{color:#18cfd4}
+
+@media(max-width:900px){
+  .game-layout{grid-template-columns:1fr;}
+  #packages{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:520px){
+  #packages{grid-template-columns:1fr;}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo-wrap" onclick="location.href='index.html'">
+    <img src="https://drive.google.com/uc?id=1bQHl8e6PqisZtauV2mnvcKWH10DjXvJ7" class="logo">
+    <b>DGC eStore</b>
+  </div>
+  <div class="search-bar">
+    <input placeholder="Search games…">
+  </div>
+</header>
+
+<div class="section">
+  <div class="game-layout">
+
+    <div class="card">
+      <h3>Product Description</h3>
+      <p>⚡ 5–10 minutes process</p>
+      <p>💬 Customer Service: 07 AM – 12 AM</p>
+      <p>🌏 PH Region</p>
+    </div>
+
+    <div class="card">
+      <h3>Order | Direct Top-Up</h3>
+
+      <label>Name</label>
+      <input id="customer">
+
+      <label>Player ID</label>
+      <input id="playerId">
+
+      <label>Zone ID</label>
+      <input id="zoneId">
+
+      <h3>Choose Package</h3>
+      <div id="packages"></div>
+
+      <label>Quantity</label>
+      <input type="number" id="qty" value="1" min="1">
+
+      <h3>Total: ₱<span id="total">0.00</span></h3>
+
+      <button onclick="openPayment()">PROCEED TO PAYMENT</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal" id="paymentModal">
+  <div class="modal-box">
+    <h3>GCash Payment</h3>
+    <p>Order Ref: <b id="orderRef"></b></p>
+
+    <img src="gcash-qr.png" alt="GCash QR">
+
+    <label>Upload Payment Receipt</label>
+    <input type="file" id="receiptFile" accept="image/*">
+
+    <button onclick="submitPayment()">SUBMIT PAYMENT</button>
+  </div>
+</div>
+
+<footer>
+  <b>DGC eStore</b> © 2026 • Fast & Secure Game Top-Up
+</footer>
+
+<script>
+const packages=[
+  {name:"Weekly Diamond Pass",price:91.72},
+  {name:"Twilight Pass",price:434},
+  {name:"55 Diamonds",price:47.29}
+];
+
+const pkgWrap=document.getElementById("packages");
+const qtyEl=document.getElementById("qty");
+const totalEl=document.getElementById("total");
+let selected=packages[0];
+
+packages.forEach((p,i)=>{
+  const d=document.createElement("div");
+  d.className="item-card"+(i===0?" active":"");
+  d.innerHTML=`<b>${p.name}</b><div class="item-price">₱${p.price.toFixed(2)}</div>`;
+  d.onclick=()=>{
+    document.querySelectorAll(".item-card").forEach(x=>x.classList.remove("active"));
+    d.classList.add("active");
+    selected=p;
+    calc();
+  };
+  pkgWrap.appendChild(d);
+});
+
+function calc(){totalEl.innerText=(selected.price*qtyEl.value).toFixed(2)}
+qtyEl.oninput=calc; calc();
+
+const modal=document.getElementById("paymentModal");
+const orderRefEl=document.getElementById("orderRef");
+
+function openPayment(){
+  if(!customer.value || !playerId.value || !zoneId.value){
+    alert("Complete all fields");
+    return;
+  }
+
+  const ref="DGC-"+Date.now();
+  orderRefEl.innerText=ref;
+  modal.style.display="block";
+
+  if(/Android|iPhone/i.test(navigator.userAgent)){
+    window.location.href="gcash://send?phone=09107471145";
+  }
+}
+
+function submitPayment(){
+  const file=document.getElementById("receiptFile");
+  if(!file.files.length){
+    alert("Upload payment receipt");
+    return;
+  }
+
+  // SAVE RECEIPT DATA
+localStorage.setItem("orderData", JSON.stringify({
+  customer: customer.value,
+  product: selected.name,
+  quantity: qtyEl.value,
+  payment: "GCash",
+  total: totalEl.innerText
+}));
+
+localStorage.setItem("currentOrderId", orderRefEl.innerText);
+
+// SAVE ADMIN ORDER
+let orders = JSON.parse(localStorage.getItem("dgc_orders") || "[]");
+
+orders.push({
+  id: orderRefEl.innerText,
+  item: selected.name,
+  price: totalEl.innerText,
+  customer: customer.value,
+  ign: playerId.value + " (" + zoneId.value + ")",
+  payment: "GCash",
+  status: "Pending",
+  date: new Date().toLocaleString(),
+  receipt: URL.createObjectURL(
+    document.getElementById("receiptFile").files[0]
+  )
+});
+
+localStorage.setItem("dgc_orders", JSON.stringify(orders));
+
+// GO TO RECEIPT PAGE
+window.location.href = "receipt.html";
+}
+</script>
+
+</body>
+</html>
